@@ -89,7 +89,14 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
-              
+                // logout 설정
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
+
+                .build();
     }
 
     @Value("${cors.allowed-origins:http://localhost:3000}")
