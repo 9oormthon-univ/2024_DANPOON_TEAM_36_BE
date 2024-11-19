@@ -24,6 +24,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import univ.yesummit.global.auth.util.JwtUtils;
+import univ.yesummit.global.oauth.OAuth2MemberService;
+import univ.yesummit.global.oauth.OAuth2SuccessHandler;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
 
 @Slf4j
 @Configuration
@@ -32,8 +40,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
+    private final OAuth2MemberService oAuth2MemberService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final JwtUtils jwtUtils;
 
-
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtils);
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,6 +75,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .anyRequest().permitAll())
 
                 // oauth2Login 설정
@@ -69,15 +84,12 @@ public class SecurityConfig {
                                 authorization.baseUri("/oauth2/authorization"))  // 인증 요청 엔드포인트 설정
                         .redirectionEndpoint(redirection ->
                                 redirection.baseUri("/login/oauth2/code/*"))  // 리다이렉트 엔드포인트 설정
+                        .userInfoEndpoint((userInfoEndpointConfig) ->
+                                userInfoEndpointConfig.userService(oAuth2MemberService))
+                        .successHandler(oAuth2SuccessHandler))
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
-                // logout 설정
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID"))
-
-                .build();
+              
     }
 
     @Value("${cors.allowed-origins:http://localhost:3000}")
