@@ -26,5 +26,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        WebMvcConfigurer.super.addArgumentResolvers(resolvers); // 기존 Resolver
+        resolvers.add(authArgumentResolver); // 커스텀 Resolver
+    }
 }
