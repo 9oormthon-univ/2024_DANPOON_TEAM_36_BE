@@ -20,6 +20,7 @@ on:
 
 env:
   CONTAINER_NAME: yesummit
+  JWT_SECRET: ${{ secrets.JWT_SECRET }} # JWT 환경변수
 
 jobs:
   Continuous-Integration:
