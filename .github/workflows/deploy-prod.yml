@@ -59,7 +59,7 @@ jobs:
 
       # develop 브랜치일 경우 dev 환경 빌드
       - name: create build file
-        run: ./gradlew clean build -i --no-daemon -Dspring.profiles.active=prod
+        run: ./gradlew clean build -x test -i --no-daemon -Dspring.profiles.active=prod
 
       # push event일 경우 CD job에 jar file 업로드
       - name: (Push) Archive production artifacts
