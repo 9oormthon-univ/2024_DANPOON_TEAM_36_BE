@@ -13,5 +13,4 @@ public class AuthController {
     public RedirectView login() {
         return new RedirectView("/oauth2/authorization/kakao");
     }
-    //check1
 }
