@@ -22,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     @Override
-    public void saveAdditionalInfo(MemberSignUpDTO memberSignUpDTO, Long memberId) throws Exception {
+    public void saveAdditionalInfo(Long memberId, MemberSignUpDTO memberSignUpDTO) throws Exception {
 
         if (memberId == null) {
             throw new IllegalArgumentException("회원 ID가 null입니다. 인증 정보를 확인하세요.");
@@ -68,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateInfo(MemberUpdateDTO memberUpdateDTO) throws Exception {
+    public void updateInfo(Long memberId, MemberUpdateDTO memberUpdateDTO) throws Exception {
 
         Member member = memberRepository.getByUsernameOrThrow(SecurityUtil.getLoginUsername());
 

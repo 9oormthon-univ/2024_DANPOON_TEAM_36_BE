@@ -11,7 +11,7 @@ public interface MemberService {
     /**
      * 추가 정보 수집
      */
-    void saveAdditionalInfo(MemberSignUpDTO dto, Long memberId) throws Exception;
+    void saveAdditionalInfo(Long memberId, MemberSignUpDTO dto) throws Exception;
 
     /**
      * 첫 로그인 확인
@@ -26,7 +26,7 @@ public interface MemberService {
     /**
      * 회원 정보 수정
      */
-    void updateInfo(MemberUpdateDTO dto) throws Exception;
+    void updateInfo(Long memberId, MemberUpdateDTO dto) throws Exception;
 
     /**
      * 내 정보 조회

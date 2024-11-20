@@ -31,7 +31,7 @@ public class MemberController {
     @PostMapping("/saveAdditionalInfo")
     public void saveAdditionalInfo(@User LoginUser loginUser, @Valid @RequestBody MemberSignUpDTO memberSignUpDTO) throws Exception {
         Long memberId = loginUser.getMemberId();
-        memberService.saveAdditionalInfo(memberSignUpDTO, memberId);
+        memberService.saveAdditionalInfo(memberId, memberSignUpDTO);
     }
 
     /**
@@ -40,8 +40,9 @@ public class MemberController {
     @PutMapping
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
     @ResponseStatus(HttpStatus.OK)
-    public void updateInfo(@Valid @RequestBody MemberUpdateDTO memberUpdateDTO) throws Exception {
-        memberService.updateInfo(memberUpdateDTO);
+    public void updateInfo(@User LoginUser loginUser, @Valid @RequestBody MemberUpdateDTO memberUpdateDTO) throws Exception {
+        Long memberId = loginUser.getMemberId();
+        memberService.updateInfo(memberId, memberUpdateDTO);
     }
 
     /**
