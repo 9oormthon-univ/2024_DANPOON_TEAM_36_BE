@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -47,6 +48,11 @@ public class JwtUtils {
     private static final String BEARER = "Bearer ";
 
     private final MemberRepository memberRepository;
+
+    @PostConstruct
+    public void init() {
+        log.info("JwtUtils initialized with secret: {}", secret);
+    }
 
     public String createAccessToken(Long memberId) {
 
