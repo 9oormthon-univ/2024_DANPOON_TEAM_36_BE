@@ -67,3 +67,7 @@ tasks.register('copyExternalProperties', Copy) {
 
 processResources.dependsOn('copyExternalProperties')
 processTestResources.dependsOn('copyExternalProperties')
+
+test {
+	systemProperty "spring.profiles.active", "prod"
+}
