@@ -29,6 +29,7 @@ public class MemberController {
      * 첫 소셜 로그인 시에 추가적인 정보 수집(회원가입)진행
      */
     @PostMapping("/saveAdditionalInfo")
+    @Operation(summary = "추가 정보 수집", description = "첫 로그인 시에 추가적인 정보를 수집합니다.")
     public void saveAdditionalInfo(@User LoginUser loginUser, @Valid @RequestBody MemberSignUpDTO memberSignUpDTO) throws Exception {
         Long memberId = loginUser.getMemberId();
         memberService.saveAdditionalInfo(memberId, memberSignUpDTO);
