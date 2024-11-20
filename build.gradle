@@ -59,11 +59,11 @@ tasks.named("jar") {
 	enabled = false
 }
 
-tasks.register('copyExternalProperties', Copy) {
-	from "./config"
-	include "*.yml"
-	into "src/main/resources"
-}
+//tasks.register('copyExternalProperties', Copy) {
+//	from "./config"
+//	include "*.yml"
+//	into "src/main/resources"
+//}
 
 processResources.dependsOn('copyExternalProperties')
 processTestResources.dependsOn('copyExternalProperties')
