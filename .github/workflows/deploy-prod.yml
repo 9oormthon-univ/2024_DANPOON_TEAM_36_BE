@@ -1,0 +1,145 @@
+# 필요한 Repo Secret 설정
+#### CI
+# ${{ secrets.SUBMODULE_ACCESS_TOKEN }} : 깃허브 액세스 토큰
+
+#### CD
+# ${{ secrets.DOCKER_ID }} : 도커허브 id
+# ${{ secrets.DOCKER_PASSWORD }} : 도커허브 pw
+# ${{ secrets.REMOTE_HOST_DEV }} : 배포 서버 HOSTNAME
+# ${{ secrets.REMOTE_PORT_DEV }} : 배포 서버 PORT
+# ${{ secrets.REMOTE_USERNAME_DEV }} : 배포 서버 USERNAME
+# ${{ secrets.REMOTE_SSH_KEY_DEV }} : 배포 서버 연결을 위한 SSH KEY
+
+name: Backend CI & CD (dev)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  CONTAINER_NAME: yesummit
+
+jobs:
+  Continuous-Integration:
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    # CI 실행 (환경은 github 제공)
+    runs-on: ubuntu-20.04
+    steps:
+
+      # 소스코드 체크아웃
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.ACTION_TOKEN }}
+          ref: ${{ github.head_ref }}
+
+      - name: Install JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      # Gradle Package Caching
+      - name: Caching Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Grant execute permission for gradle
+        run: chmod +x ./gradlew
+
+      # develop 브랜치일 경우 dev 환경 빌드
+      # 현재 테스트 코드를 따로 작성하지 않아. test 없이 빌드함
+      - name: create build file
+        run: ./gradlew clean build -x test -i --no-daemon -Dspring.profiles.active=prod
+
+      # push event일 경우 CD job에 jar file 업로드
+      - name: (Push) Archive production artifacts
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build/libs/*.jar
+
+  Continuous-Deploy:
+    # push 하는 경우에만 배포 JOB 실행
+    if: github.event_name == 'push'
+    needs: Continuous-Integration
+    runs-on: ubuntu-latest
+    steps:
+
+      # 소스코드 가져오기
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # 이전 Job에서 업로드한 Jar file 다운로드
+      - name : Download a built Jar File
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build/libs
+
+      # Docker Buildx Setting
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Docker Login
+      - name: Docker Login
+        uses: docker/login-action@v2.1.0
+        with:
+          # Username used to log against the Docker registry
+          username: ${{ secrets.DOCKER_ID }}
+          # Password or personal access token used to log against the Docker registry
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Docker Build & Push
+      - name: Docker Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile-dev
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{github.run_number}}
+            ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:latest
+          cache-from: type=gha    # gha=Github Action Cache
+          cache-to: type=gha,mode=max
+
+      - name: Create and execute deploy script
+        run: |
+          echo '#!/bin/bash' > deploy.sh
+          echo 'sudo docker rm -f ${{ env.CONTAINER_NAME }}' >> deploy.sh
+          echo 'sudo docker rmi ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}' >> deploy.sh
+          echo 'sudo docker pull ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}' >> deploy.sh
+          echo 'sudo docker run -d -p 8080:8080 --add-host host.docker.internal:host-gateway --restart=unless-stopped --log-opt max-size=10m --log-opt max-file=3 --name ${{ env.CONTAINER_NAME }} ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}' >> deploy.sh
+
+      - name: Transfer Deploy Script use SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST_DEV }}
+          port: ${{ secrets.REMOTE_PORT_DEV }}
+          username: ${{ secrets.REMOTE_USERNAME_DEV }}
+          key: ${{ secrets.REMOTE_SSH_KEY_DEV }}
+          source: deploy.sh
+          target: /home/${{ secrets.REMOTE_USERNAME_DEV }}/deploy
+
+      # SSH Connect
+      - name: Execute Server Init Script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST_DEV }}
+          port: ${{ secrets.REMOTE_PORT_DEV }}
+          username: ${{ secrets.REMOTE_USERNAME_DEV }}
+          key: ${{ secrets.REMOTE_SSH_KEY_DEV }}
+          script_stop: true
+          script: |
+            chmod +x /home/${{ secrets.REMOTE_USERNAME_DEV }}/deploy/deploy.sh && sh /home/${{ secrets.REMOTE_USERNAME_DEV }}/deploy/deploy.sh
