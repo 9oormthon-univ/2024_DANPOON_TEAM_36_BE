@@ -20,7 +20,6 @@ on:
 
 env:
   CONTAINER_NAME: yesummit
-  JWT_SECRET: ${{ secrets.JWT_SECRET }} # JWT 환경변수
 
 jobs:
   Continuous-Integration:
@@ -58,6 +57,7 @@ jobs:
         run: chmod +x ./gradlew
 
       # develop 브랜치일 경우 dev 환경 빌드
+      # 현재 테스트 코드를 따로 작성하지 않아. test 없이 빌드함
       - name: create build file
         run: ./gradlew clean build -x test -i --no-daemon -Dspring.profiles.active=prod
 
