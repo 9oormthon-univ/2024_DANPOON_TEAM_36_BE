@@ -2,12 +2,8 @@ package univ.yesummit.global.auth.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +12,6 @@ import org.springframework.stereotype.Service;
 import univ.yesummit.domain.member.repository.MemberRepository;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -65,10 +59,11 @@ public class JwtUtils {
     }
 
 
-    public String createRefreshToken() {
+    public String createRefreshToken(Long memberId) {
         return JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpiration))
+                .withClaim(ID_CLAIM, memberId)
                 .sign(Algorithm.HMAC512(secret));
     }
 
