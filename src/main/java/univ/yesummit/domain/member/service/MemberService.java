@@ -33,4 +33,9 @@ public interface MemberService {
      */
     MemberInfoDTO getMyInfo(Long memberId) throws Exception;
 
+    /**
+     * 로그아웃
+     */
+    void logout(Long memberId) throws Exception;
+
 }

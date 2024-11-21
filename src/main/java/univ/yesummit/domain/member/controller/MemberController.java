@@ -69,5 +69,15 @@ public class MemberController {
         MemberInfoDTO myInfo = memberService.getMyInfo(memberId);
         return ResponseEntity.ok(myInfo);
     }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다.")
+    public void logout(@User LoginUser loginUser) throws Exception {
+        Long memberId = loginUser.getMemberId();
+        memberService.logout(memberId);
+    }
 }
 

@@ -83,4 +83,12 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
         return new MemberInfoDTO(member);
     }
+
+    @Override
+    public void logout(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
+        member.destroyRefreshToken();
+        memberRepository.save(member);
+    }
 }
