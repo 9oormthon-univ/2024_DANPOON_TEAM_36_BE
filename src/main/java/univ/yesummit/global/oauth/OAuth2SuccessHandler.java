@@ -61,9 +61,41 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // 첫 로그인 여부에 따라 리다이렉트
         if (memberService.isFirstLogin(memberId)) {
-            response.sendRedirect("/additional-info");
+            response.sendRedirect("localhost:3000/additional-info");
         } else {
-            response.sendRedirect("/home");
+            response.sendRedirect("localhost:3000/home");
         }
     }
 }
+
+
+//    @Override
+//    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//        log.info("OAuth2SuccessHandler.onAuthenticationSuccess Member Name : {}", authentication.getName());
+//
+//        OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
+//        Long memberId = oAuth2Member.getMemberId();
+//
+//        // JWT 토큰 생성
+//        String accessToken = jwtUtils.createAccessToken(memberId);
+//        String refreshToken = jwtUtils.createRefreshToken(memberId);
+//
+//        // RefreshToken을 DB에 저장
+//        try {
+//            memberService.updateRefreshToken(memberId, refreshToken);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        // 클라이언트에 JWT 토큰 전송
+//        jwtUtils.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+//
+//        // 첫 로그인 여부에 따라 리다이렉트
+//        if (memberService.isFirstLogin(memberId)) {
+//            response.sendRedirect("localhost:3000/additional-info");
+//        } else {
+//            response.sendRedirect("localhost:3000/home");
+//        }
+//    }
+//}
+//
