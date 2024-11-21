@@ -11,6 +11,7 @@ import univ.yesummit.domain.member.entity.Member;
 import univ.yesummit.domain.member.exception.MemberException;
 import univ.yesummit.domain.member.repository.MemberRepository;
 import univ.yesummit.domain.member.service.MemberService;
+import univ.yesummit.global.auth.util.JwtUtils;
 import univ.yesummit.global.auth.util.SecurityUtil;
 import univ.yesummit.global.exception.ErrorCode;
 
@@ -20,6 +21,7 @@ import univ.yesummit.global.exception.ErrorCode;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final JwtUtils jwtUtils;
 
     @Override
     public void saveAdditionalInfo(Long memberId, MemberSignUpDTO memberSignUpDTO) throws Exception {
@@ -89,6 +91,28 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
         member.destroyRefreshToken();
+        memberRepository.save(member);
+    }
+
+    @Override
+    public String refreshAccessToken(String refreshToken) throws Exception {
+        if (!jwtUtils.isValid(refreshToken)) {
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token 토큰입니다");
+        }
+        Long memberId = jwtUtils.extractMemberId(refreshToken)
+                .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
+        if(!refreshToken.equals(member.getRefreshToken())) {
+            throw new IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다.");
+        }
+        return jwtUtils.createAccessToken(memberId);
+    }
+    @Override
+    public void updateRefreshToken(Long memberId, String refreshToken) throws Exception {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER));
+        member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
     }
 }

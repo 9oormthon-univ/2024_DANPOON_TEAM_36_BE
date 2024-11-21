@@ -38,4 +38,14 @@ public interface MemberService {
      */
     void logout(Long memberId) throws Exception;
 
+    /**
+     * 토큰 업데이트
+     */
+    void updateRefreshToken(Long memberId, String refreshToken) throws Exception;
+    /**
+     * 토큰 재발급
+     */
+    String refreshAccessToken(String refreshToken) throws Exception;
+
+
 }
