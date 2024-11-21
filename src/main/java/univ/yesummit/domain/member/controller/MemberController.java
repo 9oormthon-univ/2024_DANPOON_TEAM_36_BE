@@ -1,6 +1,8 @@
 package univ.yesummit.domain.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import univ.yesummit.domain.member.dto.MemberSignUpDTO;
 import univ.yesummit.domain.member.dto.MemberUpdateDTO;
 import univ.yesummit.domain.member.dto.MemberWithdrawDTO;
 import univ.yesummit.domain.member.service.MemberService;
+import univ.yesummit.global.auth.util.JwtUtils;
 import univ.yesummit.global.oauth.OAuth2Member;
 import univ.yesummit.global.resolver.LoginUser;
 import univ.yesummit.global.resolver.User;
@@ -24,6 +27,7 @@ import univ.yesummit.global.resolver.User;
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtUtils jwtUtils;
 
     /**
      * 첫 소셜 로그인 시에 추가적인 정보 수집(회원가입)진행
@@ -78,6 +82,21 @@ public class MemberController {
     public void logout(@User LoginUser loginUser) throws Exception {
         Long memberId = loginUser.getMemberId();
         memberService.logout(memberId);
+    }
+
+    /**
+     * 토큰 갱신
+     */
+    @PostMapping("/refresh")
+    @Operation(summary = "Access 토큰 재발급", description = "Refresh 토큰을 사용하여 새로운 Access 토큰을 발급받습니다.")
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String refreshToken = jwtUtils.extractRefreshToken(request)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh Token이 없습니다."));
+        // 서비스 레이어에 토큰 재발급 요청
+        String newAccessToken = memberService.refreshAccessToken(refreshToken);
+        // 새로운 Access 토큰을 응답 헤더에 추가
+        jwtUtils.sendAccessToken(response, newAccessToken);
+        return ResponseEntity.ok().build();
     }
 }
 
