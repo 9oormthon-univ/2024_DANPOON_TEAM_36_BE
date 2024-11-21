@@ -1,5 +1,6 @@
 package univ.yesummit.global.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,8 @@ import univ.yesummit.domain.member.service.MemberService;
 import univ.yesummit.global.auth.util.JwtUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -29,9 +32,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
         Long memberId = oAuth2Member.getMemberId();
 
+        boolean firstLogin = memberService.isFirstLogin(memberId);
         // JWT 토큰 생성
         String accessToken = jwtUtils.createAccessToken(memberId);
         String refreshToken = jwtUtils.createRefreshToken(memberId);
+        String redirectUrl = firstLogin ? "/additional-info" : "/home";
 
         // Refresh 토큰을 멤버 엔티티에 저장
         try {
@@ -40,33 +45,50 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             throw new RuntimeException(e);
         }
 
-        // 토큰을 쿠키에 저장
-        int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 밀리초를 초로 변환
-        int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
+        // 응답 데이터 생성
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("accessToken", accessToken);
+        responseData.put("refreshToken", refreshToken);
+        responseData.put("redirectUrl", redirectUrl);
 
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(accessTokenMaxAge);
+        // 응답 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(refreshTokenMaxAge);
-
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
-
-        // 첫 로그인 여부에 따라 리다이렉트
-        if (memberService.isFirstLogin(memberId)) {
-            response.sendRedirect("localhost:3000/additional-info");
-        } else {
-            response.sendRedirect("localhost:3000/home");
-        }
+        // JSON으로 응답
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(responseData);
+        response.getWriter().write(jsonResponse);
     }
 }
+
+
+        // 토큰을 쿠키에 저장
+//        int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 밀리초를 초로 변환
+//        int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
+//
+//        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+//        accessTokenCookie.setHttpOnly(true);
+//        accessTokenCookie.setSecure(true);
+//        accessTokenCookie.setPath("/");
+//        accessTokenCookie.setMaxAge(accessTokenMaxAge);
+//
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+//        refreshTokenCookie.setHttpOnly(true);
+//        refreshTokenCookie.setSecure(true);
+//        refreshTokenCookie.setPath("/");
+//        refreshTokenCookie.setMaxAge(refreshTokenMaxAge);
+//
+//        response.addCookie(accessTokenCookie);
+//        response.addCookie(refreshTokenCookie);
+//
+//        // 첫 로그인 여부에 따라 리다이렉트
+//        if (memberService.isFirstLogin(memberId)) {
+//            response.sendRedirect("localhost:3000/additional-info");
+//        } else {
+//            response.sendRedirect("localhost:3000/home");
+//        }
+
 
 
 //    @Override
