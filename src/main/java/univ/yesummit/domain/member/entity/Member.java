@@ -27,6 +27,8 @@ public class Member {
 
     private String providerId;
 
+    private String refreshToken;
+
     /**
      * 추가 정보 필드
      */
@@ -92,5 +94,13 @@ public class Member {
         this.businessIdeaField = businessIdeaField;
         this.consentSummitAlerts = consentSummitAlerts;
         this.consentPrivacyPolicy = consentPrivacyPolicy;
+    }
+
+    //== 토큰 관련 ==//
+    public void updateRefreshToken(String newRefreshToken) {
+        this.refreshToken = newRefreshToken;
+    }
+    public void destroyRefreshToken() {
+        this.refreshToken = null;
     }
 }
