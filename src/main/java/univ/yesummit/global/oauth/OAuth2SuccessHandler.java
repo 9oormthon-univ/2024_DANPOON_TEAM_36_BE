@@ -37,7 +37,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtUtils.createAccessToken(memberId);
         String refreshToken = jwtUtils.createRefreshToken(memberId);
 
-        // Redirect 경로 설정
+        // Redirect 경로 지정
         String redirectUrl = firstLogin ? "/additional-info" : "/home";
 
         // Refresh 토큰을 멤버 엔티티에 저장
