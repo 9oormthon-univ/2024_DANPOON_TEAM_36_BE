@@ -1,6 +1,7 @@
 package univ.yesummit.global.oauth;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,27 +29,41 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
         Long memberId = oAuth2Member.getMemberId();
 
-        // JWT 토큰 발급
+        // JWT 토큰 생성
         String accessToken = jwtUtils.createAccessToken(memberId);
         String refreshToken = jwtUtils.createRefreshToken(memberId);
 
-        // refreshToken을 member 엔티티에 저장
+        // Refresh 토큰을 멤버 엔티티에 저장
         try {
             memberService.updateRefreshToken(memberId, refreshToken);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        jwtUtils.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        // 토큰을 쿠키에 저장
+        int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 밀리초를 초로 변환
+        int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
 
-        // 기존 회원인지 확인
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(accessTokenMaxAge);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(refreshTokenMaxAge);
+
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+
+        // 첫 로그인 여부에 따라 리다이렉트
         if (memberService.isFirstLogin(memberId)) {
-            // 첫 로그인 시 추가 정보 입력 페이지로 리다이렉트
             response.sendRedirect("/additional-info");
-            return;
+        } else {
+            response.sendRedirect("/home");
         }
-
-        // 기존 회원이라면 정상 응답 (e.g., 메인 페이지로 리다이렉트)
-        response.sendRedirect("/home");
     }
 }
