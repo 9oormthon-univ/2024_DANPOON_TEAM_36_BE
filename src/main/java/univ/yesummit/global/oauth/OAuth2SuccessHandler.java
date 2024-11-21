@@ -30,10 +30,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // JWT 토큰 발급
         String accessToken = jwtUtils.createAccessToken(memberId);
-        String refreshToken = jwtUtils.createRefreshToken();
+        String refreshToken = jwtUtils.createRefreshToken(memberId);
+
+        // refreshToken을 member 엔티티에 저장
+        try {
+            memberService.updateRefreshToken(memberId, refreshToken);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         jwtUtils.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-        // 기존 회원인지 확인
         // 기존 회원인지 확인
         if (memberService.isFirstLogin(memberId)) {
             // 첫 로그인 시 추가 정보 입력 페이지로 리다이렉트
