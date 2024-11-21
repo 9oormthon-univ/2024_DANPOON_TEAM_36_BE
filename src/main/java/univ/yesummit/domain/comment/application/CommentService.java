@@ -43,6 +43,8 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
+        checkCommentOwnership(member, comment);
+
         comment.updateComment(commentUpdateReqDto.comment());
 
         return CommentInfoResDto.of(comment);
@@ -57,6 +59,15 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
+        checkCommentOwnership(member, comment);
+
         commentRepository.delete(comment);
+    }
+
+    // 댓글 소유권 확인
+    private void checkCommentOwnership(Member member, Comment comment) {
+        if (!member.getId().equals(comment.getWriter().getId())) {
+            throw new IllegalStateException("본인이 작성한 댓글만 수정 및 삭제 할 수 있습니다.");
+        }
     }
 }
