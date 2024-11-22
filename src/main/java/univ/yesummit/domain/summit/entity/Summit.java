@@ -1,4 +1,4 @@
-package univ.yesummit.domain.gpt.entity;
+package univ.yesummit.domain.summit.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
