@@ -32,9 +32,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         Long memberId = oAuth2Member.getMemberId();
 
         // 첫 로그인 여부 확인
-        String redirectUrl = memberService.isFirstLogin(memberId)
-                ? "http://localhost:3000/signup"
-                : "http://localhost:3000/home";
+        String redirectUrl = "http://localhost:3000/login-success";
 
         // 리다이렉트 URL에 userId 추가
         response.sendRedirect(redirectUrl + "?userId=" + memberId);
