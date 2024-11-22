@@ -33,7 +33,7 @@ public class BoardController {
             @ApiResponse(responseCode = "200", description = "등록 성공"),
             @ApiResponse(responseCode = "401", description = "인증실패", content = @Content(schema = @Schema(example = "INVALID_HEADER or INVALID_TOKEN"))),
     })
-    @PostMapping(value= "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value= "/summit/{summitId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> boardSave(@User LoginUser loginUser,
                                             @RequestBody BoardSaveReqDto boardSaveReqDto) {
 
@@ -42,16 +42,40 @@ public class BoardController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "주제별 PT 영상 게시글 조회", description = "주제별 PT 영상 게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증실패", content = @Content(schema = @Schema(example = "INVALID_HEADER or INVALID_TOKEN"))),
+            @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다."))),
+    })
+    @GetMapping("/summit/{summitId}/list")
+    public ResponseEntity<List<BoardInfoResDto>> allBoardInfo(@PathVariable Long summitId) {
+        List<BoardInfoResDto> allBoards = boardService.allBoardInfoBySummitId(summitId);
+        return new ResponseEntity<>(allBoards, HttpStatus.OK);
+    }
+
+    @Operation(summary = "PT 영상 게시글 조회", description = "PT 영상 게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다.")))
+    })
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardInfoResDto> boardInfo(@PathVariable(name = "boardId") Long boardId) {
+        BoardInfoResDto boardInfo = boardService.boardInfo(boardId);
+        return new ResponseEntity<>(boardInfo, HttpStatus.OK);
+    }
+
+
     @Operation(summary = "내가 작성한 PT 영상 게시글 조회", description = "특정 사용자가 작성한 PT 영상 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증실패", content = @Content(schema = @Schema(example = "INVALID_HEADER or INVALID_TOKEN"))),
             @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다."))),
     })
-    @GetMapping("/my/{boardId}")
+    @GetMapping("/my")
     public ResponseEntity<BoardInfoResDto> myBoardInfo(@User LoginUser loginUser, @PathVariable(name = "boardId") Long boardId) {
-        BoardInfoResDto boardInfo = boardService.boardInfo(loginUser.getMemberId(), boardId);
-        return new ResponseEntity<>(boardInfo, HttpStatus.OK);
+        BoardInfoResDto myBoardInfo = boardService.myBoardInfo(loginUser.getMemberId(), boardId);
+        return new ResponseEntity<>(myBoardInfo, HttpStatus.OK);
     }
 
     @Operation(summary = "PT 영상 게시글 수정", description = "PT 영상 게시글을 수정합니다.")
@@ -62,8 +86,8 @@ public class BoardController {
     })
     @PutMapping("/{boardId}")
     public ResponseEntity<BoardInfoResDto> boardUpdate(@User LoginUser loginUser,
-                                                                   @PathVariable(name = "boardId") Long boardId,
-                                                                   @RequestBody BoardUpdateReqDto boardUpdateReqDto) {
+                                                       @PathVariable(name = "boardId") Long boardId,
+                                                       @RequestBody BoardUpdateReqDto boardUpdateReqDto) {
 
         Board board = boardService.findById(boardId);
         boardService.boardUpdate(loginUser.getMemberId(), boardId, boardUpdateReqDto);

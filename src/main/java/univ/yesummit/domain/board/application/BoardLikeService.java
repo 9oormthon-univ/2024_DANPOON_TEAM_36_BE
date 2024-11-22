@@ -46,7 +46,6 @@ public class BoardLikeService {
 
     }
 
-
     // 게시글 좋아요 취소
     @Transactional
     public void cancelBoardLike(Long memberId, Board boardId) {
@@ -83,6 +82,7 @@ public class BoardLikeService {
                     return new BoardLikeResDto(
                             memberId,
                             board.getWriter().getId(),
+                            board.getWriter().getUsername(),
                             board.getBoardId(),
                             board.getTitle(),
                             board.getContent(),
@@ -91,6 +91,4 @@ public class BoardLikeService {
                 })
                 .collect(Collectors.toList());
     }
-
-
 }

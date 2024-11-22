@@ -5,13 +5,12 @@ import univ.yesummit.domain.board.domain.Board;
 import univ.yesummit.domain.board.domain.Investment;
 import univ.yesummit.domain.member.entity.Member;
 
+import java.util.List;
 import java.util.Optional;
-
 
 public interface InvestmentRepository extends JpaRepository<Investment, Long> {
 
     boolean existsByBoardAndMember(Board board, Member member);
-
     Optional<Investment> findByBoardAndMember(Board board, Member member);
-
+    List<Investment> findByBoard(Board board);
 }

@@ -7,7 +7,6 @@ import java.util.List;
 
 public record BoardSaveReqDto(
         String title,
-
         String content,
         List<String> imageUrl,
         String serviceUrl,
