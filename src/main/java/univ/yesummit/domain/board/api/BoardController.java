@@ -73,8 +73,8 @@ public class BoardController {
             @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다."))),
     })
     @GetMapping("/my")
-    public ResponseEntity<BoardInfoResDto> myBoardInfo(@User LoginUser loginUser, @PathVariable(name = "boardId") Long boardId) {
-        BoardInfoResDto myBoardInfo = boardService.myBoardInfo(loginUser.getMemberId(), boardId);
+    public ResponseEntity<BoardInfoResDto> myBoardInfo(@User LoginUser loginUser) {
+        BoardInfoResDto myBoardInfo = boardService.myBoardInfo(loginUser.getMemberId());
         return new ResponseEntity<>(myBoardInfo, HttpStatus.OK);
     }
 
@@ -107,4 +107,5 @@ public class BoardController {
         boardService.boardDelete(loginUser.getMemberId(), boardId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 }
