@@ -63,10 +63,10 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-                // iframe 차단
-                .headers(header -> header.frameOptions(
-                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
-                ))
+//                // iframe 차단
+//                .headers(header -> header.frameOptions(
+//                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
+//                ))
 
                 // session 사용 중지
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -99,15 +99,15 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Value("${cors.allowed-origins:http://localhost:3000}")
-    private List<String> allowOriginList;
+//    @Value("${cors.allowed-origins")
+//    private List<String> allowOriginList;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowOriginList); // 허용할 Origin 추가
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.addAllowedOrigin("http://localhost:3000"); // 클라이언트 주소
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
