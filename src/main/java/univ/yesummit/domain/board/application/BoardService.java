@@ -62,19 +62,25 @@ public class BoardService {
 
     // 주제별 게시글 전체 조회
     @Transactional
-    public List<BoardInfoResDto> allBoardInfoBySummitId(Long memberId, Long summitId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
+    public List<BoardInfoResDto> allBoardInfoBySummitId(Long summitId) {
         List<Board> boards = boardRepository.findBySummitId(summitId);
         return boards.stream()
-                .map(board -> BoardInfoResDto.of(member, board, boardLikeRepository.existsByBoardAndMember(board, member)))
+                .map(board -> BoardInfoResDto.of(null, board, false))
                 .collect(Collectors.toList());
+    }
+
+    // 게시글 한개 조회
+    @Transactional
+    public BoardInfoResDto boardInfo(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        return BoardInfoResDto.of(null, board, false);
     }
 
     // (내가 작성한) 게시글 한개 조회
     @Transactional
-    public BoardInfoResDto boardInfo(Long memberId, Long boardId) {
+    public BoardInfoResDto myBoardInfo(Long memberId, Long boardId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
@@ -142,5 +148,4 @@ public class BoardService {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
     }
-
 }
