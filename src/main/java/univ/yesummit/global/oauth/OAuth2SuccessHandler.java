@@ -48,14 +48,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
 
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setHttpOnly(true); // js 접근 불가
+        accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(accessTokenMaxAge);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true); // js 접근 불가
+        refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(refreshTokenMaxAge);
 
