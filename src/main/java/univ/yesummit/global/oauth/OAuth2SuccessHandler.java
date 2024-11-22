@@ -30,6 +30,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
         Long memberId = oAuth2Member.getMemberId();
+        log.info("userId: {}", memberId);
 
         // 첫 로그인 여부 확인
         String redirectUrl = "http://localhost:3000/login-success";
