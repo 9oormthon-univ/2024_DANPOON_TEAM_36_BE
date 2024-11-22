@@ -9,6 +9,5 @@ import java.util.List;
 public interface BoardPictureRepository extends JpaRepository<BoardPicture, String> {
 
     void deleteByBoardBoardId(Long boardId);
-
     void deleteByBoardAndImageUrlIn(Board board, List<String> urlsToDelete);
 }
