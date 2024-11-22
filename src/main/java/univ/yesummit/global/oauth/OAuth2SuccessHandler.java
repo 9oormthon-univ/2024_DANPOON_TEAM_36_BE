@@ -28,36 +28,50 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("OAuth2SuccessHandler.onAuthenticationSuccess Member Name : {}", authentication.getName());
-
         OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
         Long memberId = oAuth2Member.getMemberId();
 
-        // JWT 토큰 생성
-        String accessToken = jwtUtils.createAccessToken(memberId);
-        String refreshToken = jwtUtils.createRefreshToken(memberId);
-
-        // Refresh 토큰을 멤버 엔티티에 저장
-        try {
-            memberService.updateRefreshToken(memberId, refreshToken);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
         // 첫 로그인 여부 확인
-        boolean isFirstLogin = memberService.isFirstLogin(memberId);
+        String redirectUrl = memberService.isFirstLogin(memberId)
+                ? "http://localhost:3000/signup"
+                : "http://localhost:3000/home";
 
-        // JSON 응답으로 전달할 데이터 생성
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("accessToken", accessToken);
-        responseData.put("refreshToken", refreshToken);
-        responseData.put("firstLogin", isFirstLogin);
-
-        // JSON 응답 설정
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        // JSON 데이터를 응답으로 전송
-        new ObjectMapper().writeValue(response.getWriter(), responseData);
+        // 리다이렉트 URL에 userId 추가
+        response.sendRedirect(redirectUrl + "?userId=" + memberId);
     }
+
+//    @Override
+//    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//        log.info("OAuth2SuccessHandler.onAuthenticationSuccess Member Name : {}", authentication.getName());
+//
+//        OAuth2Member oAuth2Member = (OAuth2Member) authentication.getPrincipal();
+//        Long memberId = oAuth2Member.getMemberId();
+//
+//        // JWT 토큰 생성
+//        String accessToken = jwtUtils.createAccessToken(memberId);
+//        String refreshToken = jwtUtils.createRefreshToken(memberId);
+//
+//        // Refresh 토큰을 멤버 엔티티에 저장
+//        try {
+//            memberService.updateRefreshToken(memberId, refreshToken);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        // 첫 로그인 여부 확인
+//        boolean isFirstLogin = memberService.isFirstLogin(memberId);
+//
+//        // JSON 응답으로 전달할 데이터 생성
+//        Map<String, Object> responseData = new HashMap<>();
+//        responseData.put("accessToken", accessToken);
+//        responseData.put("refreshToken", refreshToken);
+//        responseData.put("firstLogin", isFirstLogin);
+//
+//        // JSON 응답 설정
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//
+//        // JSON 데이터를 응답으로 전송
+//        new ObjectMapper().writeValue(response.getWriter(), responseData);
+//    }
 }
