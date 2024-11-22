@@ -44,56 +44,34 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             throw new RuntimeException(e);
         }
 
-        // 첫 로그인 여부 확인
-        boolean firstLogin = memberService.isFirstLogin(memberId);
+        // 토큰을 HttpOnly 쿠키에 저장
+        int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 초 단위로 변환
+        int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
 
-        // 응답 데이터 생성
-        Map<String, Object> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-        tokens.put("firstLogin", firstLogin);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(true) // HTTPS에서만 동작
+                .sameSite("None")
+                .path("/")
+                .maxAge(accessTokenMaxAge)
+                .build();
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(refreshTokenMaxAge)
+                .build();
 
-        // JSON 응답 생성
-        new ObjectMapper().writeValue(response.getWriter(), tokens);
-    }
-}
-
-//        // 토큰을 쿠키에 저장
-//        int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 밀리초를 초로 변환
-//        int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
-
-//        // Access Token 쿠키
-//        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
-//                .httpOnly(true)
-//                .secure(true) // HTTPS에서만 동작
-//                .sameSite("None") // Cross-Domain 허용
-//                .path("/")
-//                .domain("yesummit.kro.kr") // 도메인 지정
-//                .maxAge(accessTokenMaxAge)
-//                .build();
-//
-//        // Refresh Token 쿠키
-//        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-//                .httpOnly(true)
-//                .secure(true)
-//                .sameSite("None")
-//                .path("/")
-//                .domain("yesummit.kro.kr")
-//                .maxAge(refreshTokenMaxAge)
-//                .build();
-//
-//
-//        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-//        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         // 첫 로그인 여부에 따라 리다이렉트
-//        if (memberService.isFirstLogin(memberId)) {
-//            response.sendRedirect("http://localhost:3000/signup");
-//        } else {
-//            response.sendRedirect("http://localhost:3000/home");
-//        }
-//    }
-//}
+        if (memberService.isFirstLogin(memberId)) {
+            response.sendRedirect("http://localhost:3000/signup");
+        } else {
+            response.sendRedirect("http://localhost:3000/home");
+        }
+    }
+}
