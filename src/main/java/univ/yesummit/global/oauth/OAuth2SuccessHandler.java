@@ -47,17 +47,22 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         int accessTokenMaxAge = jwtUtils.getAccessExpiration().intValue() / 1000; // 밀리초를 초로 변환
         int refreshTokenMaxAge = jwtUtils.getRefreshExpiration().intValue() / 1000;
 
+        // Access Token 쿠키
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-//        accessTokenCookie.setHttpOnly(true); // js 접근 불가
-//        accessTokenCookie.setSecure(false);
-        accessTokenCookie.setPath("/");
+        accessTokenCookie.setHttpOnly(true); // JavaScript 접근 불가
+        accessTokenCookie.setSecure(false); // HTTPS가 아닌 경우 false
+        accessTokenCookie.setDomain("localhost"); // 로컬 환경 도메인 설정
+        accessTokenCookie.setPath("/"); // 모든 경로에서 유효
         accessTokenCookie.setMaxAge(accessTokenMaxAge);
 
+        // Refresh Token 쿠키
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-//        refreshTokenCookie.setHttpOnly(true); // js 접근 불가
-//        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setDomain("localhost");
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(refreshTokenMaxAge);
+
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
