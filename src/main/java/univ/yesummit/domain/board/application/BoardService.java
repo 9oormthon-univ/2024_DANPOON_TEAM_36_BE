@@ -31,9 +31,10 @@ public class BoardService {
 
     // 게시글 저장
     @Transactional
-    public Long boardSave(Long id, BoardSaveReqDto boardSaveReqDto) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."+ id));
+    public Long boardSave(Long memberId, BoardSaveReqDto boardSaveReqDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다." + memberId));
+
         Board board = boardSaveReqDto.toEntity(member);
 
         if (board == null) {
@@ -41,14 +42,13 @@ public class BoardService {
         }
 
         boardImageSave(board, boardSaveReqDto);
-        Board saveBoard = boardRepository.save(board);
+        Board savedBoard = boardRepository.save(board);
 
-        if (saveBoard == null) {
+        if (savedBoard == null) {
             throw new IllegalStateException("게시글 저장에 실패했습니다.");
         }
 
-        return saveBoard.getBoardId();
-
+        return savedBoard.getBoardId();
     }
 
     private void boardImageSave(Board board, BoardSaveReqDto boardSaveReqDto) {
@@ -60,22 +60,22 @@ public class BoardService {
         }
     }
 
-    // 게시글 전체 조회
+    // 주제별 게시글 전체 조회
     @Transactional
-    public List<BoardInfoResDto> allBoardInfo(Long memberId) {
+    public List<BoardInfoResDto> allBoardInfoBySummitId(Long memberId, Long summitId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-        List<Board> boards = boardRepository.findAll();
+        List<Board> boards = boardRepository.findBySummitId(summitId);
         return boards.stream()
                 .map(board -> BoardInfoResDto.of(member, board, boardLikeRepository.existsByBoardAndMember(board, member)))
                 .collect(Collectors.toList());
     }
 
-    // 게시글 한개 조회
+    // (내가 작성한) 게시글 한개 조회
     @Transactional
-    public BoardInfoResDto boardInfo(Long id, Long boardId) {
-        Member member = memberRepository.findById(id)
+    public BoardInfoResDto boardInfo(Long memberId, Long boardId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Board board = boardRepository.findById(boardId)
@@ -90,8 +90,8 @@ public class BoardService {
 
     // 게시글 수정
     @Transactional
-    public BoardInfoResDto boardUpdate(Long id, Long boardId, BoardUpdateReqDto boardUpdateReqDto) {
-        Member member = memberRepository.findById(id)
+    public BoardInfoResDto boardUpdate(Long memberId, Long boardId, BoardUpdateReqDto boardUpdateReqDto) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Board board = boardRepository.findById(boardId)
@@ -101,7 +101,7 @@ public class BoardService {
 
         board.boardUpdate(boardUpdateReqDto);
 
-        // 새로운 이미지 url만 받아서 추가한다.
+        // 새로운 이미지 url만 받아서 추가
         for (String url : boardUpdateReqDto.newImageUrl()) {
             boardPictureRepository.save(BoardPicture.builder()
                     .board(board)
@@ -117,8 +117,8 @@ public class BoardService {
 
     // 게시글 삭제
     @Transactional
-    public void boardDelete(Long id, Long boardId) {
-        Member member = memberRepository.findById(id)
+    public void boardDelete(Long memberId, Long boardId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Board board = boardRepository.findById(boardId)
