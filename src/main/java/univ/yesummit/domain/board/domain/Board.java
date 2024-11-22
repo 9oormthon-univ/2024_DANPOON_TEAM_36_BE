@@ -47,6 +47,9 @@ public class Board {
     @NotNull(message = "필수 입력 항목입니다.")
     private String PTUrl;
 
+    @Column(name = "summitId")
+    private Long summitId;
+
     @Schema(description = "게시글 날짜", example = "2024.06.21")
     private String boardDate;
 
@@ -69,7 +72,7 @@ public class Board {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer) {
+    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer,Long isSummit) {
         this.title = title;
         this.content = content;
         this.serviceUrl = serviceUrl;
@@ -77,8 +80,8 @@ public class Board {
         this.boardDate = String.valueOf(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         this.likeCount = 0;
         this.writer = writer;
+        this.summitId = summitId;
     }
-
 
     public void boardUpdate(BoardUpdateReqDto boardUpdateReqDto) {
         this.title = boardUpdateReqDto.title();
@@ -106,5 +109,4 @@ public class Board {
             this.investmentCount--;
         }
     }
-
 }
