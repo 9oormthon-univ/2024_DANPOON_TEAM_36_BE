@@ -80,17 +80,14 @@ public class BoardService {
 
     // (내가 작성한) 게시글 한개 조회
     @Transactional
-    public BoardInfoResDto myBoardInfo(Long memberId, Long boardId) {
+    public BoardInfoResDto myBoardInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findFirstByWriter(member)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        checkBoardOwnership(member, board);
-
         boolean isLike = boardLikeRepository.existsByBoardAndMember(board, member);
-
         return BoardInfoResDto.of(member, board, isLike);
     }
 
