@@ -15,4 +15,9 @@ public interface InvestmentRepository extends JpaRepository<Investment, Long> {
     Optional<Investment> findByBoardAndMember(Board board, Member member);
 
     List<Investment> findByMember(Member member);
+
+    List<Investment> findByBoard(Board board);
+
+    // 게시글 작성자 ID로 투자 조회
+    List<Investment> findAllByBoardWriterId(Long writerId);
 }
