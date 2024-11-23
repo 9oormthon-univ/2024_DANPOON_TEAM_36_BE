@@ -36,3 +36,11 @@
 <p align="center">
     <img src="https://skillicons.dev/icons?i=figma"><img src="https://skillicons.dev/icons?i=notion"><img src="https://skillicons.dev/icons?i=discord">
 </p>
+
+<br>
+<br>
+
+## 서버 플로우 동작
+<p align="center">
+   ![image](https://github.com/user-attachments/assets/2fbff691-83bb-4a19-980e-72c617ab4321)
+</p>
