@@ -70,7 +70,7 @@ public class Board {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer,Long isSummit, List<BoardPicture> pictures) {
+    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer,List<BoardPicture> pictures, Long summitId) {
         this.title = title;
         this.content = content;
         this.pictures = pictures;
