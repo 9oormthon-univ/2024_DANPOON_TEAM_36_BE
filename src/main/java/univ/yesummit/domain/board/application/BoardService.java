@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import univ.yesummit.domain.board.api.dto.request.BoardSaveReqDto;
 import univ.yesummit.domain.board.api.dto.request.BoardUpdateReqDto;
 import univ.yesummit.domain.board.api.dto.response.BoardInfoResDto;
@@ -17,9 +16,7 @@ import univ.yesummit.domain.feed.entity.Feed;
 import univ.yesummit.domain.feed.repository.FeedRepository;
 import univ.yesummit.domain.member.entity.Member;
 import univ.yesummit.domain.member.repository.MemberRepository;
-import univ.yesummit.global.s3.service.S3Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,11 +80,12 @@ public class BoardService {
 
     // 게시글 한개 조회
     @Transactional
-    public BoardInfoResDto boardInfo(Long boardId) {
+    public BoardInfoResDto boardInfo(Long boardId, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-
-        return BoardInfoResDto.of(null, board, false);
+        return BoardInfoResDto.of(member, board, false);
     }
 
     // (내가 작성한) 게시글 한개 조회
