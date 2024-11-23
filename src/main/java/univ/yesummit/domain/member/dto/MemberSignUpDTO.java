@@ -18,9 +18,6 @@ public record MemberSignUpDTO(
         @NotBlank(message = "연락처를 입력해주세요")
         String phoneNumber,
 
-        @NotBlank(message = "이메일을 입력해주세요")
-        String email,
-
         @NotNull(message = "참여자 구분을 선택해주세요")
         UserType userType, // 청년 창업가 or 예비 투자자
 
@@ -45,7 +42,6 @@ public record MemberSignUpDTO(
         return Member.builder()
                 .username(name)
                 .phoneNumber(phoneNumber)
-                .email(email)
                 .userType(userType)
                 .company(company)
                 .position(position)
