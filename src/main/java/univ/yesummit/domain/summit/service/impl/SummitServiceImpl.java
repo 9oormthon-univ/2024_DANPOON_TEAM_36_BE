@@ -22,7 +22,7 @@ public class SummitServiceImpl implements SummitService {
 
         // 엔티티 리스트를 DTO 리스트로 변환
         return summits.stream()
-                .map(summit -> new SummitResponseDTO(summit.getTitle(), summit.getContent()))
+                .map(summit -> new SummitResponseDTO(summit.getId(), summit.getTitle(), summit.getContent()))
                 .collect(Collectors.toList());
     }
 
@@ -31,6 +31,6 @@ public class SummitServiceImpl implements SummitService {
         Summit summit = summitRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("써밋을 찾을 수 없습니다"));
 
-        return new SummitResponseDTO(summit.getTitle(), summit.getContent());
+        return new SummitResponseDTO(summit.getId(), summit.getTitle(), summit.getContent());
     }
 }
