@@ -14,6 +14,7 @@ import univ.yesummit.domain.board.api.dto.request.BoardUpdateReqDto;
 import univ.yesummit.domain.board.api.dto.response.BoardInfoResDto;
 import univ.yesummit.domain.board.application.BoardService;
 import univ.yesummit.domain.board.domain.Board;
+import univ.yesummit.domain.board.domain.BoardPicture;
 import univ.yesummit.global.resolver.LoginUser;
 import univ.yesummit.global.resolver.User;
 
@@ -36,7 +37,6 @@ public class BoardController {
     @PostMapping(value= "/summit/{summitId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> boardSave(@User LoginUser loginUser,
                                             @RequestBody BoardSaveReqDto boardSaveReqDto) {
-
         Long boardId = boardService.boardSave(loginUser.getMemberId(), boardSaveReqDto);
         String message = String.format("%d번 게시글 등록!", boardId);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
@@ -64,7 +64,6 @@ public class BoardController {
         BoardInfoResDto boardInfo = boardService.boardInfo(boardId);
         return new ResponseEntity<>(boardInfo, HttpStatus.OK);
     }
-
 
     @Operation(summary = "내가 작성한 PT 영상 게시글 조회", description = "특정 사용자가 작성한 PT 영상 게시글을 조회합니다.")
     @ApiResponses(value = {
