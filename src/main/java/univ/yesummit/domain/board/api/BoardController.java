@@ -60,8 +60,8 @@ public class BoardController {
             @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다.")))
     })
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardInfoResDto> boardInfo(@PathVariable(name = "boardId") Long boardId) {
-        BoardInfoResDto boardInfo = boardService.boardInfo(boardId);
+    public ResponseEntity<BoardInfoResDto> boardInfo(@PathVariable(name = "boardId") Long boardId, @User LoginUser loginUser) {
+        BoardInfoResDto boardInfo = boardService.boardInfo(boardId, loginUser.getMemberId());
         return new ResponseEntity<>(boardInfo, HttpStatus.OK);
     }
 
