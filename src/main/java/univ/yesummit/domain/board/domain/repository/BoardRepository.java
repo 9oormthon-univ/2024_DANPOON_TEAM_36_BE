@@ -9,5 +9,9 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findFirstByWriter(Member member);
+    List<Board> findByWriter(Member member);
+
     List<Board> findBySummitId(Long summitId);
+
+    List<Board> findAllByBoardIdIn(List<Long> boardIds);
 }
