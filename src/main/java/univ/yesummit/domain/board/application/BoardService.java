@@ -74,7 +74,7 @@ public class BoardService {
         List<Board> boards = boardRepository.findBySummitId(summitId);
         Member member = memberId != null ? memberRepository.findById(memberId).orElse(null) : null; // memberId로 member 조회
         return boards.stream()
-                .map(board -> BoardInfoResDto.of(member, board, false)) // member 정보를 전달
+                .map(board -> BoardInfoResDto.of(board.getWriter(), board, false)) // member 정보를 전달
                 .collect(Collectors.toList());
     }
 
