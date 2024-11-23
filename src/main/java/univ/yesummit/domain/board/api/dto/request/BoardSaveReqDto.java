@@ -12,7 +12,9 @@ public record BoardSaveReqDto(
         String content,
         List<String> imageUrl,
         String serviceUrl,
-        String PTUrl
+        String PTUrl,
+        Long summitId
+
 ) {
     public Board toEntity(Member member) {
         List<String> images = (imageUrl == null) ? new ArrayList<>() : imageUrl;
@@ -30,6 +32,7 @@ public record BoardSaveReqDto(
                 .pictures(boardPictures)
                 .serviceUrl(serviceUrl)
                 .PTUrl(PTUrl)
+                .summitId(summitId)
                 .writer(member)
                 .build();
     }
