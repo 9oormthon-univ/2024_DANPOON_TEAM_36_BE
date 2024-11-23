@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import univ.yesummit.domain.board.api.dto.request.BoardSaveReqDto;
 import univ.yesummit.domain.board.api.dto.request.BoardUpdateReqDto;
 import univ.yesummit.domain.board.api.dto.response.BoardInfoResDto;
@@ -21,12 +21,13 @@ import univ.yesummit.global.resolver.User;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/api/board")
 public class BoardController {
     private final BoardService boardService;
-    public BoardController(BoardService boardService) {
-        this.boardService = boardService;
-    }
+    private Logger log;
+
+
 
     @Operation(summary = "PT 영상 및 정보 등록", description = "PT 영상 및 정보를 등록합니다.")
     @ApiResponses(value = {
@@ -35,11 +36,22 @@ public class BoardController {
     })
     @PostMapping("/summit/{summitId}")
     public ResponseEntity<String> boardSave(@User LoginUser loginUser,
+                                            @PathVariable Long summitId,
                                             @RequestBody BoardSaveReqDto boardSaveReqDto) {
-        Long boardId = boardService.boardSave(loginUser.getMemberId(), boardSaveReqDto);
+        BoardSaveReqDto updatedBoardSaveReqDto = new BoardSaveReqDto(
+                boardSaveReqDto.title(),
+                boardSaveReqDto.content(),
+                boardSaveReqDto.imageUrl(),
+                boardSaveReqDto.serviceUrl(),
+                boardSaveReqDto.PTUrl(),
+                summitId
+        );
+
+        Long boardId = boardService.boardSave(loginUser.getMemberId(), updatedBoardSaveReqDto);
         String message = String.format("%d번 게시글 등록!", boardId);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
+
 
     @Operation(summary = "주제별 PT 영상 게시글 조회", description = "주제별 PT 영상 게시글을 조회합니다.")
     @ApiResponses(value = {
