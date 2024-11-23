@@ -35,7 +35,6 @@ public class BoardController {
     })
     @PostMapping("/summit/{summitId}")
     public ResponseEntity<String> boardSave(@User LoginUser loginUser,
-                                            @PathVariable Long summitId,
                                             @RequestBody BoardSaveReqDto boardSaveReqDto) {
         Long boardId = boardService.boardSave(loginUser.getMemberId(), boardSaveReqDto);
         String message = String.format("%d번 게시글 등록!", boardId);
