@@ -25,9 +25,6 @@ import java.util.List;
 @RequestMapping("/v1/api/board")
 public class BoardController {
     private final BoardService boardService;
-    private Logger log;
-
-
 
     @Operation(summary = "PT 영상 및 정보 등록", description = "PT 영상 및 정보를 등록합니다.")
     @ApiResponses(value = {

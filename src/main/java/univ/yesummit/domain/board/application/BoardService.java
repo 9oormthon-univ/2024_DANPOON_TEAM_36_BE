@@ -35,12 +35,10 @@ public class BoardService {
     // 게시글 저장
     @Transactional
     public Long boardSave(Long memberId, BoardSaveReqDto boardSaveReqDto) {
-        log.info("Received BoardSaveReqDto: {}", boardSaveReqDto);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다. " + memberId));
 
         Board board = boardSaveReqDto.toEntity(member);
-        log.info("Board object created: {}", board);
 
         List<Feed> feeds = getFeedsByMember(member);
         boardImageSave(board, boardSaveReqDto.imageUrl(), feeds);
