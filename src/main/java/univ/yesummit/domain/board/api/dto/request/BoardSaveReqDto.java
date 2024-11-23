@@ -6,6 +6,7 @@ import univ.yesummit.domain.member.entity.Member;
 
 import java.util.List;
 
+import java.util.ArrayList;
 public record BoardSaveReqDto(
         String title,
         String content,
@@ -13,13 +14,11 @@ public record BoardSaveReqDto(
         String serviceUrl,
         String PTUrl
 ) {
-    public BoardSaveReqDto {
-        if (imageUrl == null) {
-            throw new IllegalArgumentException("이미지 URL null");
-        }
-    }
     public Board toEntity(Member member) {
-        List<BoardPicture> boardPictures = imageUrl.stream()
+        List<String> images = (imageUrl == null) ? new ArrayList<>() : imageUrl;
+
+        // imageUrl 리스트를 이용해 BoardPicture 객체 리스트 생성
+        List<BoardPicture> boardPictures = images.stream()
                 .map(url -> BoardPicture.builder()
                         .imageUrl(url)
                         .build())
@@ -29,10 +28,9 @@ public record BoardSaveReqDto(
                 .title(title)
                 .content(content)
                 .pictures(boardPictures)
-                .writer(member)
                 .serviceUrl(serviceUrl)
                 .PTUrl(PTUrl)
+                .writer(member)
                 .build();
     }
-
 }
