@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface InvestmentRepository extends JpaRepository<Investment, Long> {
 
     boolean existsByBoardAndMember(Board board, Member member);
+
     Optional<Investment> findByBoardAndMember(Board board, Member member);
-    List<Investment> findByBoard(Board board);
+
+    List<Investment> findByMember(Member member);
 }
