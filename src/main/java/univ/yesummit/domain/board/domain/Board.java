@@ -49,7 +49,7 @@ public class Board {
     private Long summitId;
 
     @Schema(description = "게시글 날짜", example = "2024.06.21")
-    private String boardDate;
+    private LocalDateTime boardDate;
 
     @Schema(description = "좋아요 개수", example = "1")
     private int likeCount;
@@ -76,7 +76,7 @@ public class Board {
         this.pictures = pictures;
         this.serviceUrl = serviceUrl;
         this.PTUrl = PTUrl;
-        this.boardDate = String.valueOf(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        this.boardDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         this.likeCount = 0;
         this.writer = writer;
         this.summitId = summitId;
