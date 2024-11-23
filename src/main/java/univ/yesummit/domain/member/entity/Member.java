@@ -18,7 +18,6 @@ public class Member {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
     private String email;
 
     private Authority authority; //ADMIN, USER, SIGN_OUT

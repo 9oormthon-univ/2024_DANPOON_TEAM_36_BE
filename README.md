@@ -42,5 +42,5 @@
 
 ## 서버 플로우 동작
 <p align="center">
-   ![image](https://github.com/user-attachments/assets/2fbff691-83bb-4a19-980e-72c617ab4321)
+ <img src="https://github.com/user-attachments/assets/97a26b16-72c8-4285-8d02-6cc68243cbff" alt="카카오 로그인">
 </p>
