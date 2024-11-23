@@ -9,12 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import univ.yesummit.domain.board.api.dto.request.BoardSaveReqDto;
 import univ.yesummit.domain.board.api.dto.request.BoardUpdateReqDto;
 import univ.yesummit.domain.board.api.dto.response.BoardInfoResDto;
 import univ.yesummit.domain.board.application.BoardService;
 import univ.yesummit.domain.board.domain.Board;
-import univ.yesummit.domain.board.domain.BoardPicture;
 import univ.yesummit.global.resolver.LoginUser;
 import univ.yesummit.global.resolver.User;
 
@@ -23,7 +23,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/api/board")
 public class BoardController {
-
     private final BoardService boardService;
     public BoardController(BoardService boardService) {
         this.boardService = boardService;
@@ -34,8 +33,9 @@ public class BoardController {
             @ApiResponse(responseCode = "200", description = "등록 성공"),
             @ApiResponse(responseCode = "401", description = "인증실패", content = @Content(schema = @Schema(example = "INVALID_HEADER or INVALID_TOKEN"))),
     })
-    @PostMapping(value= "/summit/{summitId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping("/summit/{summitId}")
     public ResponseEntity<String> boardSave(@User LoginUser loginUser,
+                                            @PathVariable Long summitId,
                                             @RequestBody BoardSaveReqDto boardSaveReqDto) {
         Long boardId = boardService.boardSave(loginUser.getMemberId(), boardSaveReqDto);
         String message = String.format("%d번 게시글 등록!", boardId);
@@ -49,8 +49,8 @@ public class BoardController {
             @ApiResponse(responseCode = "404", description = "게시글 없음", content = @Content(schema = @Schema(example = "게시글이 존재하지 않습니다."))),
     })
     @GetMapping("/summit/{summitId}/list")
-    public ResponseEntity<List<BoardInfoResDto>> allBoardInfo(@PathVariable Long summitId) {
-        List<BoardInfoResDto> allBoards = boardService.allBoardInfoBySummitId(summitId);
+    public ResponseEntity<List<BoardInfoResDto>> allBoardInfo(@PathVariable Long summitId, @User LoginUser loginUser) {
+        List<BoardInfoResDto> allBoards = boardService.allBoardInfoBySummitId(summitId, loginUser.getMemberId());
         return new ResponseEntity<>(allBoards, HttpStatus.OK);
     }
 
@@ -106,5 +106,4 @@ public class BoardController {
         boardService.boardDelete(loginUser.getMemberId(), boardId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-}
+    }

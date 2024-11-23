@@ -34,7 +34,7 @@ public class BoardPicture {
 
     @Builder
     private BoardPicture(String imageUrl, Board board, Feed feed) {
-        this.imageUrl = imageUrl;
+        this.imageUrl = (feed != null) ? feed.getImage() : imageUrl;
         this.board = board;
         this.feed = feed;
     }

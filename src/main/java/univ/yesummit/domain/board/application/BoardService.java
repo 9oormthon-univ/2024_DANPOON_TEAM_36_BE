@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import univ.yesummit.domain.board.api.dto.request.BoardSaveReqDto;
 import univ.yesummit.domain.board.api.dto.request.BoardUpdateReqDto;
 import univ.yesummit.domain.board.api.dto.response.BoardInfoResDto;
@@ -12,9 +13,13 @@ import univ.yesummit.domain.board.domain.BoardPicture;
 import univ.yesummit.domain.board.domain.repository.BoardLikeRepository;
 import univ.yesummit.domain.board.domain.repository.BoardPictureRepository;
 import univ.yesummit.domain.board.domain.repository.BoardRepository;
+import univ.yesummit.domain.feed.entity.Feed;
+import univ.yesummit.domain.feed.repository.FeedRepository;
 import univ.yesummit.domain.member.entity.Member;
 import univ.yesummit.domain.member.repository.MemberRepository;
+import univ.yesummit.global.s3.service.S3Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,44 +33,51 @@ public class BoardService {
     private final BoardPictureRepository boardPictureRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final MemberRepository memberRepository;
+    private final FeedRepository feedRepository;
 
     // 게시글 저장
     @Transactional
     public Long boardSave(Long memberId, BoardSaveReqDto boardSaveReqDto) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다." + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다. " + memberId));
 
         Board board = boardSaveReqDto.toEntity(member);
 
-        if (board == null) {
-            throw new IllegalStateException("게시글 객체 생성 실패.");
-        }
+        List<Feed> feeds = getFeedsByMember(member);
+        boardImageSave(board, boardSaveReqDto.imageUrl(), feeds);
 
-        boardImageSave(board, boardSaveReqDto);
         Board savedBoard = boardRepository.save(board);
-
-        if (savedBoard == null) {
-            throw new IllegalStateException("게시글 저장에 실패했습니다.");
-        }
-
         return savedBoard.getBoardId();
     }
 
-    private void boardImageSave(Board board, BoardSaveReqDto boardSaveReqDto) {
-        for (String imageUrl : boardSaveReqDto.imageUrl()) {
+    // Feed 데이터를 가져오는 헬퍼 메서드
+    private List<Feed> getFeedsByMember(Member member) {
+        return feedRepository.findAllByMember(member);
+    }
+
+
+    private void boardImageSave(Board board, List<String> imageUrls, List<Feed> feeds) {
+        for (String imageUrl : imageUrls) {
             boardPictureRepository.save(BoardPicture.builder()
                     .board(board)
-                    .imageUrl(imageUrl)
+                    .imageUrl(imageUrl) // URL 직접 저장
+                    .build());
+        }
+        for (Feed feed : feeds) {
+            boardPictureRepository.save(BoardPicture.builder()
+                    .board(board)
+                    .feed(feed) // Feed에서 이미지 추출하여 저장
                     .build());
         }
     }
 
-    // 주제별 게시글 전체 조회
+
     @Transactional
-    public List<BoardInfoResDto> allBoardInfoBySummitId(Long summitId) {
+    public List<BoardInfoResDto> allBoardInfoBySummitId(Long summitId, Long memberId) {
         List<Board> boards = boardRepository.findBySummitId(summitId);
+        Member member = memberId != null ? memberRepository.findById(memberId).orElse(null) : null; // memberId로 member 조회
         return boards.stream()
-                .map(board -> BoardInfoResDto.of(null, board, false))
+                .map(board -> BoardInfoResDto.of(member, board, false)) // member 정보를 전달
                 .collect(Collectors.toList());
     }
 

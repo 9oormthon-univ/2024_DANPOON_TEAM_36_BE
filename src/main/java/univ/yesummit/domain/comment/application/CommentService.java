@@ -24,8 +24,8 @@ public class CommentService {
 
     // 댓글 저장
     @Transactional
-    public void commentSave(String email, CommentSaveReqDto commentSaveReqDto) {
-        Member member = memberRepository.findByEmail(email)
+    public void commentSave(Long id, CommentSaveReqDto commentSaveReqDto) {
+        Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Board board = boardRepository.findById(commentSaveReqDto.boardId())
@@ -36,8 +36,8 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public CommentInfoResDto commentUpdate(String email, Long commentId, CommentUpdateReqDto commentUpdateReqDto){
-        Member member = memberRepository.findByEmail(email)
+    public CommentInfoResDto commentUpdate(Long id, Long commentId, CommentUpdateReqDto commentUpdateReqDto){
+        Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Comment comment = commentRepository.findById(commentId)
@@ -52,8 +52,8 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void commentDelete(String email, Long commentId) {
-        Member member = memberRepository.findByEmail(email)
+    public void commentDelete(Long id, Long commentId) {
+        Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         Comment comment = commentRepository.findById(commentId)
