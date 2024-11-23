@@ -12,6 +12,7 @@ import java.util.List;
 public record BoardInfoResDto(
         Long myMemberId,
         Long writerMemberId,
+        String writerMemberName,
         Long boardId,
         String title,
         String content,
@@ -29,10 +30,10 @@ public record BoardInfoResDto(
                 .map(BoardPicture::getImageUrl)
                 .toList();
 
-        // 투자하기 버튼 누른 사용자도 포함해야됨
         return BoardInfoResDto.builder()
                 .myMemberId(member.getId())
                 .writerMemberId(board.getWriter().getId())
+                .writerMemberName(board.getWriter().getUsername())
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
                 .content(board.getContent())
