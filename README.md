@@ -42,5 +42,5 @@
 
 ## 서버 플로우 동작
 <p align="center">
- <img src="![KakaoTalk_Photo_2024-11-24-03-53-19](https://github.com/user-attachments/assets/97a26b16-72c8-4285-8d02-6cc68243cbff)" alt="카카오 로그인">
+ <img src="https://github.com/user-attachments/assets/97a26b16-72c8-4285-8d02-6cc68243cbff" alt="카카오 로그인">
 </p>
