@@ -27,8 +27,6 @@ public class Board {
     @Schema(description = "피칭 게시글 id", example = "1")
     private Long boardId;
 
-    // 게시글 써밋 아이디 필드 만들기 (숫자만 저장하는 컬럼)
-
     @Schema(description = "피칭 제목", example = "제목")
     @NotNull(message = "필수 입력 항목입니다.")
     private String title;
@@ -72,9 +70,10 @@ public class Board {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer,Long isSummit) {
+    private Board(String title, String content, String serviceUrl, String PTUrl, Member writer,Long isSummit, List<BoardPicture> pictures) {
         this.title = title;
         this.content = content;
+        this.pictures = pictures;
         this.serviceUrl = serviceUrl;
         this.PTUrl = PTUrl;
         this.boardDate = String.valueOf(LocalDateTime.now(ZoneId.of("Asia/Seoul")));

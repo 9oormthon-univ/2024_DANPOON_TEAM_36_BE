@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import univ.yesummit.domain.feed.entity.Feed;
 
 @Entity
 @Getter
@@ -27,10 +28,15 @@ public class BoardPicture {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feed_id")
+    private Feed feed;
+
     @Builder
-    private BoardPicture(String imageUrl, Board board) {
+    private BoardPicture(String imageUrl, Board board, Feed feed) {
         this.imageUrl = imageUrl;
         this.board = board;
+        this.feed = feed;
     }
 
 }
