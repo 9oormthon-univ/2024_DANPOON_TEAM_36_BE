@@ -12,8 +12,6 @@
 
 ## 🧑‍💻 사용된 기술 스택
 
-<br>
-
 ### 🛠️ Tool
 
 <p align="center">
