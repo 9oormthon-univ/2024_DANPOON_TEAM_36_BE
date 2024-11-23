@@ -17,6 +17,8 @@ public record BoardInfoResDto(
         String title,
         String content,
         List<String> imageUrl,
+        String serviceUrl,
+        String PTUrl,
         int likeCount,
         boolean isLike,
         int InvestmentCount,
@@ -38,6 +40,8 @@ public record BoardInfoResDto(
                 .title(board.getTitle())
                 .content(board.getContent())
                 .imageUrl(imageUrl)
+                .serviceUrl(builder().serviceUrl)
+                .PTUrl(builder().PTUrl)
                 .likeCount(board.getLikeCount())
                 .commentCount(board.getComments().size())
                 .date(board.getBoardDate())
