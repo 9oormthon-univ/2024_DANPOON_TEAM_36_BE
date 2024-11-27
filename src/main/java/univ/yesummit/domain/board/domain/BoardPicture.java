@@ -38,5 +38,4 @@ public class BoardPicture {
         this.board = board;
         this.feed = feed;
     }
-
 }

@@ -30,5 +30,4 @@ public class Investment {
         this.board = board;
         this.member = member;
     }
-
 }

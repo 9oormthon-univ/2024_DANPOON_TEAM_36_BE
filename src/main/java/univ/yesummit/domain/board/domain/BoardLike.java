@@ -30,5 +30,4 @@ public class BoardLike {
         this.board = board;
         this.member = member;
     }
-
 }

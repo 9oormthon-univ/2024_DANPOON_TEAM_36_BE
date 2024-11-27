@@ -51,5 +51,4 @@ public class Comment {
 
         System.out.println("댓글이 수정되었습니다: " + comment);
     }
-
 }
