@@ -68,7 +68,6 @@ public class BoardService {
         }
     }
 
-
     @Transactional
     public List<BoardInfoResDto> allBoardInfoBySummitId(Long summitId, Long memberId) {
         List<Board> boards = boardRepository.findBySummitId(summitId);
