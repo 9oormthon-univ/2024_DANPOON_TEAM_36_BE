@@ -44,7 +44,6 @@ public class Comment {
             throw new IllegalArgumentException("댓글 내용은 비어 있을 수 없습니다.");
         }
         if (this.comment.equals(comment)) {
-            // 새로운 내용이 현재 내용과 동일한 경우, 아무 작업도 하지 않음
             return;
         }
         this.comment = comment;
