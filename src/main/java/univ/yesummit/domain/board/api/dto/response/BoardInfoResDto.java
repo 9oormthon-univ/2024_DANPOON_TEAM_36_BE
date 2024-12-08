@@ -25,7 +25,7 @@ public record BoardInfoResDto(
         int InvestmentCount,
         boolean invest,
         int commentCount,
-        String date, // 포맷팅된 날짜 필드
+        String date,
         List<CommentInfoResDto> comments
 ) {
     public static BoardInfoResDto of(Member member, Board board, boolean isLike) {
